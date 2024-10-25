@@ -3,7 +3,7 @@ from rest_framework.pagination import LimitOffsetPagination
 from rest_framework.response import Response
 
 
-class CustomPostPagination(LimitOffsetPagination):
+class PostPagination(LimitOffsetPagination):
     """Класс кастомной пагинации для постов."""
 
     def get_paginated_response(self, data):

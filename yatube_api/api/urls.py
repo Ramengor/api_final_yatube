@@ -1,5 +1,5 @@
 """Модуль для определения URL-адресов API."""
-from django.urls import path, include
+from django.urls import include, path
 from rest_framework.routers import DefaultRouter
 
 from api.views import (
@@ -15,5 +15,6 @@ router.register(r'posts/(?P<post_id>\d+)/comments',
 
 urlpatterns = [
     path('v1/', include(router.urls)),
+    path('v1/', include('djoser.urls')),
     path('v1/', include('djoser.urls.jwt')),
 ]

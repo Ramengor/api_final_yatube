@@ -6,3 +6,4 @@ class PostsConfig(AppConfig):
     """Конфигурация приложения Posts."""
 
     name = 'posts'
+    verbose_name = 'Посты'

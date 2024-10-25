@@ -1,15 +1,14 @@
 """Модуль представлений API."""
 from django.shortcuts import get_object_or_404
+from rest_framework import mixins, permissions, viewsets
+from rest_framework.viewsets import GenericViewSet, ReadOnlyModelViewSet
 
-from rest_framework import permissions, viewsets
-from rest_framework.viewsets import ReadOnlyModelViewSet
 
-
-from posts.models import Post, Comment, Group, Follow
-from api.serializers import (PostSerializer, CommentSerializer,
-                             GroupSerializer, FollowSerializer)
+from posts.models import Post, Group, Follow
+from api.serializers import (CommentSerializer, FollowSerializer,
+                             GroupSerializer, PostSerializer,)
 from api.permissions import IsAuthorOrReadOnly
-from api.pagination import CustomPostPagination
+from api.pagination import PostPagination
 
 
 class PostViewSet(viewsets.ModelViewSet):
@@ -19,7 +18,8 @@ class PostViewSet(viewsets.ModelViewSet):
     serializer_class = PostSerializer
     permission_classes = [permissions.IsAuthenticatedOrReadOnly,
                           IsAuthorOrReadOnly]
-    pagination_class = CustomPostPagination
+
+    pagination_class = PostPagination
 
     def perform_create(self, serializer):
         """Сохраняет пост с автором текущего пользователя."""
@@ -29,7 +29,6 @@ class PostViewSet(viewsets.ModelViewSet):
 class CommentViewSet(viewsets.ModelViewSet):
     """Представление для управления комментариями."""
 
-    queryset = Comment.objects.all()
     serializer_class = CommentSerializer
     permission_classes = [permissions.IsAuthenticatedOrReadOnly,
                           IsAuthorOrReadOnly]
@@ -43,7 +42,7 @@ class CommentViewSet(viewsets.ModelViewSet):
     def get_queryset(self):
         """Возвращает все комментарии для заданного поста."""
         post = self.get_post()
-        return Comment.objects.filter(post=post)
+        return post.comments.all()
 
     def perform_create(self, serializer):
         """Сохраняет комментарий с автором и привязывает его к посту."""
@@ -56,11 +55,12 @@ class GroupViewSet(ReadOnlyModelViewSet):
 
     queryset = Group.objects.all()
     serializer_class = GroupSerializer
-    permission_classes = [permissions.IsAuthenticatedOrReadOnly]
+    permission_classes = [permissions.AllowAny]
     pagination_class = None
 
 
-class FollowViewSet(viewsets.ModelViewSet):
+class FollowViewSet(mixins.ListModelMixin, mixins.CreateModelMixin,
+                    GenericViewSet):
     """Представление для управления подписками пользователей."""
 
     serializer_class = FollowSerializer
