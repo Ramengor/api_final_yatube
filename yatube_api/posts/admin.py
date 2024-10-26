@@ -1,7 +1,7 @@
 """Модуль настройки административной панели для моделей приложения."""
 from django.contrib import admin
 
-from posts.models import Comment, Group, Post
+from posts.models import Comment, Follow, Group, Post
 
 
 class PostsInline(admin.TabularInline):
@@ -40,3 +40,13 @@ class GroupAdmin(admin.ModelAdmin):
     list_filter = ('title',)
     empty_value_display = '-пусто-'
     inlines = [PostsInline]
+
+
+@admin.register(Follow)
+class FollowAdmin(admin.ModelAdmin):
+    """Настройки отображения модели Follow в админке."""
+
+    list_display = ('id', 'user', 'following')
+    search_fields = ('user__username', 'following__username')
+    list_filter = ('user', 'following')
+    empty_value_display = '-пусто-'
